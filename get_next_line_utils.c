@@ -23,28 +23,9 @@ size_t	ft_strlen(const char *s)
 	}
 	return (i);
 }
+// param b for buffer
 
-char	*ft_strdup(const char *s)
-{
-	char			*str;
-	unsigned int	s_len;
-	unsigned int	i;
-
-	i = 0;
-	s_len = ft_strlen(s);
-	str = (char *)malloc(sizeof(char) * (s_len + 1));
-	if (!str)
-		return (NULL);
-	while (i < s_len)
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *stash, char const *b)
 {
 	char	*str;
 	int		i;
@@ -52,24 +33,33 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	j = 0;
 	i = 0;
-	str = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	str = (char *)malloc(sizeof(char) * (ft_strlen(stash) + ft_strlen(b) + 1));
 	if (!str)
 		return (NULL);
-	while (s1[i])
+	while (stash[i])
 	{
-		str[j] = s1[i];
+		str[j] = stash[i];
 		i++;
 		j++;
 	}
 	i = 0;
-	while (s2[i])
+	while (b[i])
 	{
-		str[j] = s2[i];
+		str[j] = b[i];
 		i++;
 		j++;
 	}
 	str[j] = '\0';
 	return (str);
+}
+
+char	*ft_join_and_free_buff(char *stash, char *buffer)
+{
+	char	*tmp;
+
+	tmp = ft_strjoin(stash, buffer);
+	free(stash);
+	return (tmp);
 }
 
 void	*ft_calloc(size_t nmemb, size_t size)

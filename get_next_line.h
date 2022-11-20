@@ -24,13 +24,12 @@
 
 size_t	ft_strlen(const char *s);
 void	*ft_calloc(size_t nmemb, size_t size);
-char	*ft_move_to_next_line(char *stash);
+char	*ft_clean_stash(char *stash);
 char	*ft_get_stash_from_read(int fd, char *stash);
 char	*ft_join_and_free_buff(char *buffer, char *buffer_from_read);
-char	*ft_store_line(char *stash);
+char	*ft_extract_line_from_stash(char *stash);
 char	*ft_strjoin(char const *buffer, char const *buffer_from_read);
 char	*ft_strchr(const char *s, int c);
 char	*get_next_line(int fd);
-char	*ft_strdup(const char *s);
 
 #endif

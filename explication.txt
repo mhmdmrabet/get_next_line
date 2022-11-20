@@ -1,0 +1,99 @@
+GET NEXT LINE
+
+- Lire depuis un fichier et retourner la prochaine ligne que l'on trouve. Une ligne se finis par un '\0' ou par la fin du fichier.
+
+- Bon à savoir :
+	- La fonction "read()" : Lis un certain nombre d'octet à partir d'un flux. L'ensemble des octets lu seront stocker dans un buffer passer en second parametre. Le buffer doit donc etre de taille suffisante par rapport à la taille données demandées. Il faut spécifier le nombre d'octet à lire dans le troisième paramètre.
+Le paramètre buffer permet de spécifier le bloc mémoire dans lequel stocker les octets à lire.
+	- La fonction "open()" : Permet d'ouvrir un fichier. Renvoi un descripteur de fichier.
+Renvoient le descripteur de fichier s'ils réussit ou -1 s'il échoue.
+
+- Deux variables de type char* : 
+	- stash : variable static qui va me permettre de stocker le retour du buffer meme lorsque l'on appel la fonction plusieurs fois.
+	- line : J'extrait une ligne depuis stash et je la stocke dans cette variable pour la retourner a la fin de ma fonction.
+
+- Je dois d'abord vérifier si :
+	- fd n'est pas < 0 pcq sinon ça signifierait que le la fonction "open()"n'a pas réussi à ouvrir le fichier.
+	- Que la taille du "BUFFER_SIZE" passer en argument n'est pas <= 0 car on aurait un probleme pour la passer à notre fonction "read()"
+	- Que la fonction "read()" ne retourne pas une valeur negatif ou 0.
+Si un de ces cas est rencontré je retourne "NULL" et je stop l'execution de la fonction.
+
+A. Lire depuis le fichier et stocker dans la "stash"
+
+- Quatre variable
+	- fd : File Descriptor
+	- stash : variable static que l'on passe pour stocker la partie lu par "read()"
+	- buffer : stocke la partie lu par "read()"
+	- result : valeur retourner par "read()"
+
+- Initialisé la reserve si "stash" est "NULL" :
+	- Permet d'allouer de la mémoire avec "ft_calloc()" pour pourvoir faire un join par la suite sinon il y aurais un soucis.
+
+- Allouer de la mémoire pour le buffer : 
+	- Allouer avec "ft_calloc()" de la taille de "BUFFER_SIZE" + 1 pour ajouter le '\0' a la fin du buffer. 
+
+- Initialisé "result" a 1 afin de jouer sur le retour de "read()" pour boucler dessus et lire jusqu'a la fin du fichier ou jusqu'a que le buffer se trouve un retour a la ligne.
+
+- Boucler tant que la valeur de retour de "read()" est > 0
+	- "read()" retourne 0 quand on finis de lire le fichier. 
+	- Faire appel a "read()" et stocker son retour dans "result"
+	- "read()" : 
+		- Si read échoue, on free le "buffer" et on retourne (NULL) pour stoper la fonction.
+		- Sinon :
+			- On ajoute à la fin du buffer un '\0' pour signifier dans la mémoire la fin de la str ajouter dans le buffer. C'est grace au "result" que l'on sait ou se termine la str.
+			- On appel la fonction "ft_join_and_free()" pour concatener "buffer" et "stash" et désallouer le contenu de stash. Cette nouvelle chaine de charactère sera stocker dans la static var "stash".
+			- On vérifie que dans le contenu de "buffer" il n'y a pas de '\n'. S'il y a en un, on arrete la boucle. Sinon on passe à l'iteration suivante.
+
+- Apres la boucle, On "free()" le "buffer" et retourne la valeur de "stash".
+
+B. Extraire une ligne depuis "stash"
+
+- Quatre variables :
+	- stash : récuperer depuis le param de la fonction. Permet de stocker les retours du buffer. Et ici va nous servir à extraire une ligne.
+	- line : où l'on stockera la ligne trouver dans "stash"
+	- i : L'index qui nous permettra de boucler sur "stash"
+	- len_line : stocker la longeur de la ligne. 
+
+- On vérifie que "stash" n'est pas vide. S'il est vide on retourne "NULL" et on stop la fonction.
+
+- On boucle sur stash tant qu'on est pas à la fin de stash et tant qu'on a pas rencontré de '\n' : Cela va nous permettre de récuperer la longueur de la ligne afind d'allouer un espace suffisant de mémoire pour stocker la ligne.
+
+- Grace a "len_line" et "ft_calloc()" on alloue suffisament de memoire pour stokcer une ligne. 
+Il faut ajouter 2 a "len_line" pour avoir la place de mettre le '\n' et le '\0' dans "line".
+
+- On Boucle sur stash[i] tant qu'on ne rencontre pas '\0' et de '\n' :
+	- Cette boucle va nous permettre de stocker le contenu de "stash" avant le '\n' dans "line".
+
+- En sortant de la boucle On vérifie si on est la fin de "stash" ou si on est bien arrivé au '\n' :
+	- Si c'est le cas on ajoute le '\n' dans la "line" à la position "i"
+
+- On finit par retourner "line".
+
+C. Nettoyer la stash pour retirer la ligne extraite
+
+- Cinq variables : 
+	- stash : L'endroit de reference pour supprimer la ligne.
+	- new_stash : Où je vais stocker ma nouvelle réserve sans la ligne deja envoyé.
+	- i : index permettant de boucler sur "stash"
+	- j : index permttant de boucler sur "new_stash"
+	- stash_len : récupère la longueur de stash.
+
+- Je boucle sur "stash[i]" tant que ce n'est n'est pas '\0' et '\n':
+	- J'incrémente "i" pour décaler à l'index au '\n' dans "stash[i]"
+
+- Je vérifie que je ne suis pas à la fin de "stash" :
+	- Si je suis à la fin, je "free()" "stash" et je retourne "NULL" pour stopper l'execution de la fonction.
+
+- J'alloue avec "ft_calloc()" la longueur de "stash" MOINS "i" (valeur de la taille de "stash" jusqu'au '\n') PLUS 1 (pour le '\0' de fin) de la mémoire pour stocker la contenu de "new_stash".
+
+- Je decale "i" de 1 pour me trouver juste après le '\n' dans "stash".
+
+- Je boucle sur "stash[i]" tant que je suis pas arriver à la fin de stash
+	- Je copie le contenu de "stash[i]" dans "new_stash[j]"
+	- "j" demarre à 0 & "i" démarre la valeur après '\n'
+
+- Je "free()" "stash"
+
+- Je retourne "new_stash"
+
+==> A la fin de GNL, je retourne la "line".

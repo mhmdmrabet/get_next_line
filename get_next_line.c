@@ -22,8 +22,8 @@ char	*get_next_line(int fd)
 	stash = ft_get_stash_from_read(fd, stash);
 	if (!stash)
 		return (NULL);
-	line = ft_store_line(stash);
-	stash = ft_move_to_next_line(stash);
+	line = ft_extract_line_from_stash(stash);
+	stash = ft_clean_stash(stash);
 	return (line);
 }
 
@@ -34,9 +34,13 @@ char	*ft_get_stash_from_read(int fd, char *stash)
 
 	if (!stash)
 		stash = ft_calloc(1, 1);
+	if (!stash)
+		return (NULL);
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return (NULL);
 	result = 1;
-	while (result > 0)
+	while (result > 0 && (ft_strchr(buffer, '\n') == 0))
 	{
 		result = read(fd, buffer, BUFFER_SIZE);
 		if (result == -1)
@@ -46,41 +50,44 @@ char	*ft_get_stash_from_read(int fd, char *stash)
 		}	
 		buffer[result] = '\0';
 		stash = ft_join_and_free_buff(stash, buffer);
-		if (ft_strchr(buffer, '\n'))
-			break ;
 	}
 	free(buffer);
 	return (stash);
 }
 
-char	*ft_store_line(char *stash)
+char	*ft_extract_line_from_stash(char *stash)
 {
 	char	*line;
+	int		len_line;
 	int		i;
 
 	i = 0;
+	len_line = 0;
 	if (!stash[i])
 		return (NULL);
-	while (stash[i] && stash[i] != '\n')
-		i++;
-	line = ft_calloc(i + 2, sizeof(char));
-	i = 0;
+	while (stash[len_line] && stash[len_line] != '\n')
+		len_line++;
+	line = ft_calloc(len_line + 2, sizeof(char));
+	if (!line)
+		return (NULL);
 	while (stash[i] && stash[i] != '\n')
 	{
 		line[i] = stash[i];
 		i++;
 	}
 	if (stash[i] && stash[i] == '\n')
-		line[i++] = '\n';
+		line[i] = '\n';
 	return (line);
 }
 
-char	*ft_move_to_next_line(char *stash)
+char	*ft_clean_stash(char *stash)
 {
-	char	*line;
+	char	*new_stash;
+	int		stash_len;
 	int		i;
 	int		j;
 
+	stash_len = ft_strlen(stash);
 	i = 0;
 	j = 0;
 	while (stash[i] && stash[i] != '\n')
@@ -90,19 +97,12 @@ char	*ft_move_to_next_line(char *stash)
 		free(stash);
 		return (NULL);
 	}
-	line = ft_calloc((ft_strlen(stash) - i + 1), sizeof(char));
+	new_stash = ft_calloc((stash_len - i + 1), sizeof(char));
+	if (!new_stash)
+		return (NULL);
 	i++;
 	while (stash[i])
-		line[j++] = stash[i++];
+		new_stash[j++] = stash[i++];
 	free(stash);
-	return (line);
-}
-
-char	*ft_join_and_free_buff(char *buffer, char *buffer_from_read)
-{
-	char	*tmp;
-
-	tmp = ft_strjoin(buffer, buffer_from_read);
-	free(buffer);
-	return (tmp);
+	return (new_stash);
 }
