@@ -12,50 +12,94 @@
 
 #include "get_next_line.h"
 
-char	*ft_strdup(const char *s)
-{
-	char			*str;
-	unsigned int	s_len;
-	unsigned int	i;
+// char	*get_next_line3(int fd)
+// {
+// 	static char	stash[BUFFER_SIZE + 1];
+// 	char		*buffer;
+// 	char		*line;
+// 	char		*tmp;
+// 	int			result;
+// 	int			i;
+// 	int			j;
 
-	i = 0;
-	s_len = ft_strlen(s);
-	str = (char *)malloc(sizeof(char) * (s_len + 1));
-	if (!str)
-		return (NULL);
-	while (i < s_len)
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
+// 	j = 0;
+// 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+// 		return (NULL);
+// 	i = 0;
+// 	tmp = ft_calloc(1, 1);
+// 	if (!tmp)
+// 		return (NULL);
+// 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+// 	if (!buffer)
+// 		return (free(tmp), NULL);
+// 	result = 1;
+// 	while (result > 0 && (ft_strchr(buffer, '\n') == 0))
+// 	{
+// 		result = read(fd, buffer, BUFFER_SIZE);
+// 		if (result == -1)
+// 			return (free(tmp), free(buffer), NULL);
+// 		buffer[result] = '\0';
+// 		if (stash[0])
+// 		{
+// 			tmp = ft_dup_and_free_tmp(stash, tmp);
+// 		}
+// 		tmp = ft_join_and_free_tmp(tmp, buffer);
+// 	}
+// 	if (!tmp[0])
+// 		return (free(tmp), free(buffer), NULL);
+// 	while (tmp[i] && tmp[i] != '\n')
+// 		i++;
+// 	if (tmp[i] == '\n')
+// 		i++;
+// 	while (tmp[i])
+// 	{
+// 		stash[j] = tmp[i];
+// 		j++;
+// 		i++;
+// 	}
+// 	stash[j] = '\0';
+// 	line = ft_calloc(i + 2, sizeof(char));
+// 	if (!line)
+// 		return (free(tmp), free(buffer), NULL);
+// 	i = 0;
 
-char	*ft_dup_and_free_tmp(char *stash, char *str)
-{
-	char	*tmp;
-
-	tmp = ft_strdup(stash);
-	free(str);
-	return (tmp);
-}
+// 	while (tmp[i] && tmp[i] != '\n')
+// 	{
+// 		line[i] = tmp[i];
+// 		i++;
+// 	}
+// 	if (tmp[i] && tmp[i] == '\n')
+// 		line[i] = '\n';
+// 	free(tmp);
+// 	free(buffer);
+// 	return (line);
+// }
 
 char	*get_next_line(int fd)
 {
 	static char	stash[BUFFER_SIZE + 1];
-	char		*buffer;
 	char		*line;
 	char		*tmp;
-	int			result;
-	int			i;
-	int			j;
 
-	j = 0;
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 		return (NULL);
-	i = 0;
-	tmp = ft_calloc(1, 1);
+	tmp = ft_strdup(stash);
+	tmp = ft_get_stash_from_read(fd, tmp);
+	if (!tmp)
+		return (NULL);
+	line = ft_extract_line_from_stash(tmp);
+	ft_clean_tmp_and_save_stash(tmp, stash);
+	free(tmp);
+	return (line);
+}
+
+char	*ft_get_stash_from_read(int fd, char *tmp)
+{
+	char	*buffer;
+	int		result;
+
+	if (!tmp)
+		tmp = ft_calloc(1, 1);
 	if (!tmp)
 		return (NULL);
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
@@ -66,32 +110,29 @@ char	*get_next_line(int fd)
 	{
 		result = read(fd, buffer, BUFFER_SIZE);
 		if (result == -1)
-			return (free(tmp), free(buffer), NULL);
+			return (free(buffer), free(tmp), NULL);
 		buffer[result] = '\0';
-		if (stash[0])
-		{
-			tmp = ft_dup_and_free_tmp(stash, tmp);
-		}
 		tmp = ft_join_and_free_tmp(tmp, buffer);
 	}
-	if (!tmp[0])
-		return (free(tmp), free(buffer), NULL);
-	while (tmp[i] && tmp[i] != '\n')
-		i++;
-	if (tmp[i] =='\n')
-		i++;
-	while (tmp[i])
-	{
-		stash[j] = tmp[i];
-		j++;
-		i++;
-	}
-	stash[j] = '\0';
-	line = ft_calloc(i + 2, sizeof(char));
-	if (!line)
-		return (free(tmp), free(buffer), NULL);
-	i = 0;
+	free(buffer);
+	return (tmp);
+}
 
+char	*ft_extract_line_from_stash(char *tmp)
+{
+	char	*line;
+	int		len_line;
+	int		i;
+
+	len_line = 0;
+	i = 0;
+	if (!tmp[i])
+		return (NULL);
+	while (tmp[len_line] && tmp[len_line] != '\n')
+		len_line ++;
+	line = ft_calloc(len_line + 2, sizeof(char));
+	if (!line)
+		return (NULL);
 	while (tmp[i] && tmp[i] != '\n')
 	{
 		line[i] = tmp[i];
@@ -99,23 +140,40 @@ char	*get_next_line(int fd)
 	}
 	if (tmp[i] && tmp[i] == '\n')
 		line[i] = '\n';
-	free(tmp);
-	free(buffer);
 	return (line);
 }
 
+void	ft_clean_tmp_and_save_stash(char *tmp, char *stash)
+{
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	while (tmp[i] && tmp[i] != '\n')
+		i++;
+	if (!tmp[i])
+	{
+		stash[0] = '\0';
+		return ;
+	}
+	i++;
+	while (tmp[i])
+		stash[j++] = tmp[i++];
+	stash[j] = '\0';
+}
 
 // int	main(void)
 // {
 // 	char		*line;
-// 	const int	fd = open("gnlTester/files/multiple_line_no_nl", O_RDONLY);
+// 	const int	fd = open("test.txt", O_RDONLY);
 // 	int			i;
 
 // 	i = 0;
 // 	while (i < 4)
 // 	{
 // 		line = get_next_line(fd);
-// 		printf("LINE : %s\n", line);
+// 		printf("LINE %d : %s\n", i, line);
 // 		free(line);
 // 		i++;
 // 	}
