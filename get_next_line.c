@@ -82,6 +82,15 @@ void	ft_clean_tmp_and_save_stash(char *tmp, char *stash)
 	stash[j] = '\0';
 }
 
+char	*ft_join_and_free_tmp(char *tmp_stash, char *buffer)
+{
+	char	*tmp;
+
+	tmp = ft_strjoin(tmp_stash, buffer);
+	free(tmp_stash);
+	return (tmp);
+}
+
 char	*get_next_line(int fd)
 {
 	static char	stash[BUFFER_SIZE + 1];
@@ -103,11 +112,11 @@ char	*get_next_line(int fd)
 // int	main(void)
 // {
 // 	char		*line;
-// 	const int	fd = open("test.txt", O_RDONLY);
+// 	const int	fd = open("explication.txt", O_RDONLY);
 // 	int			i;
 
 // 	i = 0;
-// 	while (i < 4)
+// 	while (i < 40)
 // 	{
 // 		line = get_next_line(fd);
 // 		printf("LINE %d : %s\n", i, line);

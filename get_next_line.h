@@ -26,6 +26,7 @@ size_t	ft_strlen(const char *s);
 char	*ft_get_stash_from_read(int fd, char *stash);
 void	*ft_calloc(size_t nmemb, size_t size);
 void	ft_clean_tmp_and_save_stash(char *tmp, char *stash);
+char	*ft_strdup(const char *s);
 char	*ft_join_and_free_tmp(char *buffer, char *buffer_from_read);
 char	*ft_extract_line_from_stash(char *stash);
 char	*ft_strjoin(char const *buffer, char const *buffer_from_read);

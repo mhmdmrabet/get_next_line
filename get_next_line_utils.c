@@ -52,15 +52,6 @@ char	*ft_strjoin(char const *stash, char const *b)
 	return (str);
 }
 
-char	*ft_join_and_free_tmp(char *tmp_stash, char *buffer)
-{
-	char	*tmp;
-
-	tmp = ft_strjoin(tmp_stash, buffer);
-	free(tmp_stash);
-	return (tmp);
-}
-
 void	*ft_calloc(size_t nmemb, size_t size)
 {
 	size_t	result;
@@ -99,4 +90,24 @@ char	*ft_strchr(const char *s, int c)
 		i++;
 	}
 	return (NULL);
+}
+
+char	*ft_strdup(const char *s)
+{
+	char			*str;
+	unsigned int	s_len;
+	unsigned int	i;
+
+	i = 0;
+	s_len = ft_strlen(s);
+	str = (char *)malloc(sizeof(char) * (s_len + 1));
+	if (!str)
+		return (NULL);
+	while (i < s_len)
+	{
+		str[i] = s[i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
 }
