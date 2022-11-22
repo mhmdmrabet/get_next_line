@@ -1,4 +1,4 @@
-GET NEXT LINE
+GET NEXT LINE (ALLOCATION DYNAMIQUE DE LA STASH)
 
 - Lire depuis un fichier et retourner la prochaine ligne que l'on trouve. Une ligne se finis par un '\0' ou par la fin du fichier.
 

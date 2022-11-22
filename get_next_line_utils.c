@@ -23,7 +23,6 @@ size_t	ft_strlen(const char *s)
 	}
 	return (i);
 }
-// param b for buffer
 
 char	*ft_strjoin(char const *stash, char const *b)
 {
@@ -100,33 +99,4 @@ char	*ft_strchr(const char *s, int c)
 		i++;
 	}
 	return (NULL);
-}
-
-char	*ft_strdup(const char *s)
-{
-	char			*str;
-	unsigned int	s_len;
-	unsigned int	i;
-
-	i = 0;
-	s_len = ft_strlen(s);
-	str = (char *)malloc(sizeof(char) * (s_len + 1));
-	if (!str)
-		return (NULL);
-	while (i < s_len)
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-char	*ft_dup_and_free_tmp(char *stash, char *str)
-{
-	char	*tmp;
-
-	tmp = ft_strdup(stash);
-	free(str);
-	return (tmp);
 }
