@@ -78,9 +78,10 @@ char	*get_next_line(int fd)
 		return (free(tmp), free(buffer), NULL);
 	while (tmp[i] && tmp[i] != '\n')
 		i++;
+	if (tmp[i] =='\n')
+		i++;
 	while (tmp[i])
 	{
-		// printf("tmp[%d] = %d\n", i, tmp[i]);
 		stash[j] = tmp[i];
 		j++;
 		i++;
@@ -90,6 +91,7 @@ char	*get_next_line(int fd)
 	if (!line)
 		return (free(tmp), free(buffer), NULL);
 	i = 0;
+
 	while (tmp[i] && tmp[i] != '\n')
 	{
 		line[i] = tmp[i];
@@ -103,20 +105,20 @@ char	*get_next_line(int fd)
 }
 
 
-int	main(void)
-{
-	char		*line;
-	const int	fd = open("test.txt", O_RDONLY);
-	int			i;
+// int	main(void)
+// {
+// 	char		*line;
+// 	const int	fd = open("gnlTester/files/multiple_line_no_nl", O_RDONLY);
+// 	int			i;
 
-	i = 0;
-	while (i < 4)
-	{
-		line = get_next_line(fd);
-		printf("LINE : %s\n", line);
-		free(line);
-		i++;
-	}
-	close(fd);
-	return (0);
-}
+// 	i = 0;
+// 	while (i < 4)
+// 	{
+// 		line = get_next_line(fd);
+// 		printf("LINE : %s\n", line);
+// 		free(line);
+// 		i++;
+// 	}
+// 	close(fd);
+// 	return (0);
+// }
