@@ -32,7 +32,7 @@ char	*ft_strdup(const char *s)
 	return (str);
 }
 
-char	*ft_dup_and_free_buff(char *stash, char *str)
+char	*ft_dup_and_free_tmp(char *stash, char *str)
 {
 	char	*tmp;
 
@@ -44,7 +44,7 @@ char	*ft_dup_and_free_buff(char *stash, char *str)
 char	*get_next_line(int fd)
 {
 	static char	stash[BUFFER_SIZE + 1];
-	char		buffer[BUFFER_SIZE + 1];
+	char		*buffer;
 	char		*line;
 	char		*tmp;
 	int			result;
@@ -58,29 +58,29 @@ char	*get_next_line(int fd)
 	tmp = ft_calloc(1, 1);
 	if (!tmp)
 		return (NULL);
+	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return (free(tmp), NULL);
 	result = 1;
-	while (result > 0)
+	while (result > 0 && (ft_strchr(buffer, '\n') == 0))
 	{
 		result = read(fd, buffer, BUFFER_SIZE);
 		if (result == -1)
-			return (NULL);
+			return (free(tmp), free(buffer), NULL);
 		buffer[result] = '\0';
 		if (stash[0])
 		{
-			tmp = ft_dup_and_free_buff(stash, tmp);
+			tmp = ft_dup_and_free_tmp(stash, tmp);
 		}
-		tmp = ft_join_and_free_buff(tmp, buffer);
-		if (ft_strchr(buffer, '\n'))
-			break ;
+		tmp = ft_join_and_free_tmp(tmp, buffer);
 	}
 	if (!tmp[0])
-		return (free(tmp), NULL);
+		return (free(tmp), free(buffer), NULL);
 	while (tmp[i] && tmp[i] != '\n')
 		i++;
 	while (tmp[i])
 	{
-		if (tmp[i] == '\n')
-			i++;
+		// printf("tmp[%d] = %d\n", i, tmp[i]);
 		stash[j] = tmp[i];
 		j++;
 		i++;
@@ -88,7 +88,7 @@ char	*get_next_line(int fd)
 	stash[j] = '\0';
 	line = ft_calloc(i + 2, sizeof(char));
 	if (!line)
-		return (free(tmp), NULL);
+		return (free(tmp), free(buffer), NULL);
 	i = 0;
 	while (tmp[i] && tmp[i] != '\n')
 	{
@@ -98,24 +98,25 @@ char	*get_next_line(int fd)
 	if (tmp[i] && tmp[i] == '\n')
 		line[i] = '\n';
 	free(tmp);
+	free(buffer);
 	return (line);
 }
 
 
-// int	main(void)
-// {
-// 	char	*line;
-// 	const int	fd = open("gnlTester/files/empty", O_RDONLY);
-// 	int			i;
+int	main(void)
+{
+	char		*line;
+	const int	fd = open("test.txt", O_RDONLY);
+	int			i;
 
-// 	i = 0;
-// 	while (i < 1)
-// 	{
-// 		line = get_next_line(fd);
-// 		printf("LINE : %s\n", line);
-// 		free(line);
-// 		i++;
-// 	}
-// 	close(fd);
-// 	return (0);
-// }
+	i = 0;
+	while (i < 4)
+	{
+		line = get_next_line(fd);
+		printf("LINE : %s\n", line);
+		free(line);
+		i++;
+	}
+	close(fd);
+	return (0);
+}

@@ -53,12 +53,12 @@ char	*ft_strjoin(char const *stash, char const *b)
 	return (str);
 }
 
-char	*ft_join_and_free_buff(char *stash, char *buffer)
+char	*ft_join_and_free_tmp(char *tmp_stash, char *buffer)
 {
 	char	*tmp;
 
-	tmp = ft_strjoin(stash, buffer);
-	free(stash);
+	tmp = ft_strjoin(tmp_stash, buffer);
+	free(tmp_stash);
 	return (tmp);
 }
 
