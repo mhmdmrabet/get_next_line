@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_get_stash_from_read(int fd, char *tmp)
 {
@@ -93,18 +93,18 @@ char	*ft_join_and_free_tmp(char *tmp_stash, char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	stash[((BUFFER_SIZE > 0) * BUFFER_SIZE) + 1];
+	static char	stash[1024][((BUFFER_SIZE > 0) * BUFFER_SIZE) + 1];
 	char		*line;
 	char		*tmp;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 		return (NULL);
-	tmp = ft_strdup(stash);
+	tmp = ft_strdup(stash[fd]);
 	tmp = ft_get_stash_from_read(fd, tmp);
 	if (!tmp)
 		return (NULL);
 	line = ft_extract_line_from_stash(tmp);
-	ft_clean_tmp_and_save_stash(tmp, stash);
+	ft_clean_tmp_and_save_stash(tmp, stash[fd]);
 	free(tmp);
 	return (line);
 }
