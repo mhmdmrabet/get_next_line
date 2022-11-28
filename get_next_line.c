@@ -93,7 +93,7 @@ char	*ft_join_and_free_tmp(char *tmp_stash, char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	stash[BUFFER_SIZE + 1];
+	static char	stash[((BUFFER_SIZE > 0) * BUFFER_SIZE) + 1];
 	char		*line;
 	char		*tmp;
 
