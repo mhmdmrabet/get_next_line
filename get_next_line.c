@@ -21,9 +21,10 @@ char	*ft_get_stash_from_read(int fd, char *tmp)
 		tmp = ft_calloc(1, 1);
 	if (!tmp)
 		return (NULL);
-	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buffer)
 		return (free(tmp), NULL);
+	buffer[0] = '\0';
 	result = 1;
 	while (result > 0 && (ft_strchr(buffer, '\n') == 0))
 	{
@@ -97,7 +98,7 @@ char	*get_next_line(int fd)
 	char		*line;
 	char		*tmp;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	tmp = ft_strdup(stash);
 	tmp = ft_get_stash_from_read(fd, tmp);

@@ -97,7 +97,7 @@ char	*get_next_line(int fd)
 	char		*line;
 	char		*tmp;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	tmp = ft_strdup(stash[fd]);
 	tmp = ft_get_stash_from_read(fd, tmp);
